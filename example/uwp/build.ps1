@@ -35,7 +35,7 @@ function prepare {
 
   cd build-native
 
-  cmake $td_root -DCMAKE_TOOLCHAIN_FILE="$vcpkg_cmake" -DTD_ENABLE_DOTNET=1
+  cmake "$td_root" -A Win32 -DCMAKE_TOOLCHAIN_FILE="$vcpkg_cmake" -DTD_ENABLE_DOTNET=ON
   CheckLastExitCode
   cmake --build . --target prepare_cross_compiling
   CheckLastExitCode
@@ -56,7 +56,7 @@ function config {
     if ($arch -eq "x86") {
       $fixed_arch = "win32"
     }
-    cmake "$td_root" -A $fixed_arch -DCMAKE_SYSTEM_VERSION="10.0" -DCMAKE_SYSTEM_NAME="WindowsStore" -DCMAKE_TOOLCHAIN_FILE="$vcpkg_cmake" -DTD_ENABLE_DOTNET=1
+    cmake "$td_root" -A $fixed_arch -DCMAKE_SYSTEM_VERSION="10.0" -DCMAKE_SYSTEM_NAME="WindowsStore" -DCMAKE_TOOLCHAIN_FILE="$vcpkg_cmake" -DTD_ENABLE_DOTNET=ON
     CheckLastExitCode
     cd ..
   }
@@ -92,8 +92,8 @@ function export {
     New-Item -ItemType Directory -Force -Path vsix/Redist/Retail/${arch}
     New-Item -ItemType Directory -Force -Path vsix/References/CommonConfiguration/${arch}
 
-    cp ${arch}/Debug/* -include "LIBEAY*","SSLEAY*","zlib*" vsix/Redist/Debug/${arch}/
-    cp ${arch}/Release/* -include "LIBEAY*","SSLEAY*","zlib*" vsix/Redist/Retail/${arch}/
+    cp ${arch}/Debug/* -include "SSLEAY*","LIBEAY*","libcrypto*","libssl*","zlib*" vsix/Redist/Debug/${arch}/
+    cp ${arch}/Release/* -include "SSLEAY*","LIBEAY*","libcrypto*","libssl*","zlib*" vsix/Redist/Retail/${arch}/
 
     cp ${arch}/Debug/* -filter "Telegram.Td.*" -include "*.lib" vsix/DesignTime/Debug/${arch}/
     cp ${arch}/Release/*  -filter "Telegram.Td.*" -include "*.lib" vsix/DesignTime/Retail/${arch}/

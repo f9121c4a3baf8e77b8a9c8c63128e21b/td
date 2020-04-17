@@ -1,5 +1,5 @@
 //
-// Copyright Aliaksei Levin (levlam@telegram.org), Arseny Smirnov (arseny30@gmail.com) 2014-2018
+// Copyright Aliaksei Levin (levlam@telegram.org), Arseny Smirnov (arseny30@gmail.com) 2014-2020
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,11 +7,11 @@
 #include "td/utils/benchmark.h"
 
 #include "td/utils/crypto.h"
-#include "td/utils/int_types.h"
 #include "td/utils/logging.h"
 #include "td/utils/port/thread.h"
 #include "td/utils/Random.h"
 #include "td/utils/Slice.h"
+#include "td/utils/UInt.h"
 
 #include <openssl/sha.h>
 
@@ -69,7 +69,7 @@ class AESBench : public td::Benchmark {
   void run(int n) override {
     td::MutableSlice data_slice(data, DATA_SIZE);
     for (int i = 0; i < n; i++) {
-      td::aes_ige_encrypt(key, &iv, data_slice, data_slice);
+      td::aes_ige_encrypt(as_slice(key), as_slice(iv), data_slice, data_slice);
     }
   }
 };
@@ -110,7 +110,7 @@ BENCH(TdRandFast, "td_rand_fast") {
 #if !TD_THREAD_UNSUPPORTED
 BENCH(SslRand, "ssl_rand_int32") {
   std::vector<td::thread> v;
-  std::atomic<td::uint32> sum;
+  std::atomic<td::uint32> sum{0};
   for (int i = 0; i < 3; i++) {
     v.push_back(td::thread([&] {
       td::int32 res = 0;
